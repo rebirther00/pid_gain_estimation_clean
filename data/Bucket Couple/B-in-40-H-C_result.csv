@@ -1,0 +1,26 @@
+Item,Value
+Action,Bucket In
+Duty Value,40
+Total Records,1990
+,
+=== Angle Limit Applied (Bucket In) ===,
+Applied Limit,Bkt_ang: -125.0° ~ 40.0°
+Note,Only selected action axis checked
+,
+Angle Min,-124.93
+Angle Max,39.88
+Angle Change,164.81
+Moving Time (s),19.89
+Average Velocity,-8.14
+Average Pilot Pressure,11.03
+Average Current FB,4477.80
+Response Time - current_fb_response_time,0.000
+Response Time - pilot_pressure_response_time,0.000
+Response Time - angle_response_time,0.000
+,
+=== 다른 축들의 각도 ===,
+Boom 각도,61.22
+Arm 각도,-144.71
+,
+=== 전체 각도 합계 ===,
+최종 전체 각도,-208.42

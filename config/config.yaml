@@ -1,0 +1,65 @@
+# PID 게인 추정 시스템 - 메인 설정 파일
+
+# 데이터 경로
+data:
+  raw_dir: "../pid_gain_estimation/data"  # 원본 프로젝트의 데이터 사용
+  processed_dir: "data/processed"
+  
+# 파싱 설정
+parsing:
+  valid_data_margin: 3.0  # 최종 각도 - 3도
+  sampling_rate: 0.01  # 10ms = 0.01s (100Hz)
+  
+# 전처리 설정
+preprocessing:
+  filter:
+    type: "savgol"  # 'savgol', 'moving_average', 'butter'
+    window_length: 11
+    polyorder: 3
+  velocity:
+    method: "central_diff"  # 'central_diff', 'forward_diff'
+  steady_state:
+    threshold: 0.01  # 속도 변화율 임계값 (deg/s²)
+    min_duration: 1.0  # 최소 지속 시간 (초)
+    percentage: 0.8  # 마지막 N% 구간 체크
+    
+# 시스템 식별 설정
+identification:
+  model_type: "first_order"  # 'first_order', 'second_order'
+  fitting:
+    method: "least_squares"
+    max_iterations: 1000
+    initial_guess:
+      K: 1.0  # DC gain 초기 추정값
+      tau: 1.0  # 시정수 초기 추정값
+      delay: 0.1  # 시간 지연 초기 추정값
+  goodness_of_fit:
+    min_r_squared: 0.9
+    max_rmse: 5.0  # degree
+    
+# 게인 추정 설정
+tuning:
+  ff:
+    method: ["steady_state", "dc_gain"]  # 둘 다 수행
+  pid:
+    methods: ["ziegler_nichols", "cohen_coon", "imc"]
+    imc_lambda_factor: 1.5  # λ = factor * τ
+  safety_factor: 0.8  # 보수적 게인 조정
+  
+# 커플링 분석 설정
+coupling:
+  significance_threshold: 0.05  # 5% 차이 이상
+  
+# 시각화 설정
+visualization:
+  font_family: "DejaVu Sans"  # 한글 깨짐 방지
+  dpi: 300
+  file_format: "png"
+  figsize: [12, 8]
+  
+# 로깅 설정
+logging:
+  level: "INFO"  # DEBUG, INFO, WARNING, ERROR
+  file: "logs/analysis_{timestamp}.log"
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+

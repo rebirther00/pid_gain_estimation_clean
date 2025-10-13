@@ -1,0 +1,372 @@
+---
+alwaysApply: false
+---
+# Context Testing Phase
+
+<version>1.0.0</version>
+
+## Context
+
+Context-driven development의 1.5단계: TDD 기반 테스트 설계 및 구현 전 검증
+
+**적용 조건**: 004-project-workflow의 Phase 1.5 상태일 때 (Planning 완료 후, Acting 전)
+
+## 핵심 원칙
+
+### 🎯 TDD Context 우선순위 (Red-Green-Refactor)
+
+> Test First 접근법으로 견고한 코드 구조 설계
+
+1. **필수 (Must)**: 테스트 시나리오 정의, 테스트 구조 설계, 실패 테스트 작성 
+2. **중요 (Should)**: 테스트 데이터 준비, Mock 전략, 통합 테스트 계획
+3. **선택 (Could)**: 성능 테스트, E2E 테스트, 접근성 테스트
+
+### 📋 TDD Context 수집 체크리스트
+
+**1. 테스트 시나리오 정의**
+
+- [ ] 핵심 비즈니스 로직 테스트 케이스 식별
+- [ ] Happy Path 시나리오 정의
+- [ ] Edge Case 및 Error Case 시나리오 정의
+- [ ] 사용자 인터랙션 시나리오 정의
+- [ ] 데이터 검증 시나리오 정의
+
+**2. 테스트 구조 설계**
+
+- [ ] Unit Test 범위 및 대상 컴포넌트/함수 식별
+- [ ] Integration Test 범위 및 API 연동 테스트 계획
+- [ ] Component Test 범위 및 UI 상호작용 테스트 계획
+- [ ] 테스트 파일 구조 및 네이밍 컨벤션 확인
+- [ ] 테스트 환경 설정 (Jest, React Testing Library, MSW 등)
+
+**3. 테스트 데이터 준비**
+
+- [ ] Mock 데이터 구조 설계
+- [ ] API Response Mock 데이터 준비
+- [ ] 테스트용 Fixture 데이터 생성
+- [ ] 다양한 상태값에 대한 테스트 데이터 준비
+- [ ] Error Response Mock 데이터 준비
+
+**4. Mock 전략 수립**
+
+- [ ] API 호출 Mock 전략 (MSW, jest.mock 등)
+- [ ] External Dependencies Mock 계획
+- [ ] Store/Context Mock 전략
+- [ ] 브라우저 API Mock 필요성 확인
+- [ ] 타이머/날짜 Mock 전략
+
+**5. 테스트 실행 계획**
+
+- [ ] Red Phase: 실패하는 테스트 작성 계획
+- [ ] Green Phase: 최소한의 구현으로 테스트 통과 계획
+- [ ] Refactor Phase: 코드 개선 및 테스트 유지 계획
+- [ ] 테스트 실행 순서 및 의존성 관리
+- [ ] CI/CD 파이프라인 테스트 통합 계획
+
+### ✅ 테스트 준비 완료 기준
+
+**진행 가능 (✅)**:
+
+- 필수 항목 (1,2,5) 100% 완료
+- 중요 항목 (3,4) 80% 이상 완료
+- 모든 테스트 케이스 시나리오 정의 완료
+- Mock 전략 및 테스트 데이터 준비 완료
+
+**더 조사 필요 (❌)**:
+
+- 필수 항목 미완료
+- 핵심 비즈니스 로직 테스트 케이스 불명확
+- Mock 전략 미수립
+- 테스트 환경 설정 미완료
+
+### 📝 TDD Context 정리 템플릿
+
+```markdown
+## TDD Context Summary
+
+**테스트 대상**: [Component/Function/Feature 명]
+**테스트 유형**: [Unit/Integration/Component/E2E]
+**핵심 시나리오**: [주요 비즈니스 로직 간단 설명]
+
+**테스트 시나리오**:
+
+**Happy Path**:
+- [ ] [정상적인 사용자 플로우 1]
+- [ ] [정상적인 사용자 플로우 2]
+- [ ] [정상적인 API 응답 처리]
+
+**Edge Cases**:
+- [ ] [경계값 테스트]
+- [ ] [빈 데이터 처리]
+- [ ] [최대/최소값 처리]
+
+**Error Cases**:
+- [ ] [API 에러 응답 처리]
+- [ ] [네트워크 에러 처리]
+- [ ] [Validation 에러 처리]
+
+**테스트 구조**:
+
+- 테스트 파일: [__tests__/ComponentName.test.tsx]
+- Mock 파일: [__mocks__/mockData.ts]
+- 테스트 유틸: [test-utils/...]
+
+**Mock 전략**:
+
+- API Mock: [MSW handlers 또는 jest.mock]
+- Store Mock: [Mock Provider 또는 initial state]
+- External Dependencies: [jest.mock 대상 라이브러리]
+
+**테스트 데이터**:
+
+- Mock Response: [API 응답 데이터 구조]
+- Fixture Data: [컴포넌트 props 테스트 데이터]
+- Error Data: [에러 상황 테스트 데이터]
+
+**Red-Green-Refactor 계획**:
+
+**Red Phase**:
+1. [실패하는 테스트 1] - [예상 실패 이유]
+2. [실패하는 테스트 2] - [예상 실패 이유]
+
+**Green Phase**:
+1. [최소 구현 1] - [테스트 통과를 위한 최소 코드]
+2. [최소 구현 2] - [테스트 통과를 위한 최소 코드]
+
+**Refactor Phase**:
+1. [코드 개선 포인트 1] - [리팩토링 방향]
+2. [코드 개선 포인트 2] - [리팩토링 방향]
+
+**준비 상태**: [✅ 테스트 작성 가능 / ❌ 더 조사 필요]
+**미해결 이슈**: [있다면 나열]
+```
+
+### 🚀 다음 단계 진행 조건
+
+**Testing 단계 완료 후**:
+
+- ✅ 테스트 코드 작성 완료 → **자동으로 Act 단계 진입** (004번 오케스트레이션이 [1002-context-act.mdc](mdc:.cursor/rules/1002-context-act.mdc) 호출)
+- ❌ 더 조사 필요 → 부족한 테스트 Context 추가 수집 후 재평가
+
+**테스트 완료 기준**:
+
+- Red-Green-Refactor 사이클의 Red 단계 완료 (실패하는 테스트 작성 완료)
+- 모든 핵심 테스트 케이스 작성 완료
+- Mock 데이터 및 테스트 환경 설정 완료
+
+### 🔄 단계 진행 규칙
+
+**Testing 단계에서 벗어나는 조건**:
+
+1. 테스트 코드 작성 완료 (Red 단계 완료)
+2. 모든 핵심 테스트 케이스 구현 완료
+3. **자동 전환** → Act 단계로 진입 (명시적 트리거 불필요)
+
+**Testing 단계 유지 조건**:
+
+- 테스트 코드 작성이 미완료된 상태
+- 핵심 테스트 케이스가 누락된 상태
+- Mock 데이터 또는 테스트 환경 설정이 미완료된 상태
+
+### 💡 TDD 핵심 원칙
+
+**목적**: 테스트로 설계 검증 → 안전한 구현 → 지속적 개선
+**산출물**: 실행 가능한 테스트 코드와 명확한 구현 가이드
+**체크포인트**: 모든 테스트 케이스가 비즈니스 요구사항을 반영하는지 확인
+
+### 🔗 오케스트레이션 연동
+
+**004번과의 연동**:
+
+- 이 규칙은 004번의 Phase 1.5 상태에서만 활성화
+- Planning 완료 + 명시적 테스트 트리거 발동 시 004번이 이 규칙 적용
+- 테스트 코드 작성 완료 시 004번이 자동으로 [1002-context-act.mdc](mdc:.cursor/rules/1002-context-act.mdc) 호출
+- Testing은 Planning 완료 후에만 시작 가능
+
+## 필수 사항
+
+**TDD Context가 완료되지 않으면 절대 구현 단계로 진행할 수 없습니다.** 명시적 테스트 트리거('test', '테스트 작성해줘' 등) 없이는 실제 테스트 작성으로 넘어가지 않습니다. Phase 1.5의 경우 명확한 테스트 계획이 나오지 않으면 User에게 되물어서 명확한 테스트 설계를 완성해야 합니다. 004-project-workflow.mdc가 전체 프로세스를 오케스트레이션합니다.# SHE Context Testing Phase
+
+<version>1.0.0</version>
+
+## Context
+
+Context-driven development의 1.5단계: TDD 기반 테스트 설계 및 구현 전 검증
+
+**적용 조건**: 004-project-workflow의 Phase 1.5 상태일 때 (Planning 완료 후, Acting 전)
+
+## 핵심 원칙
+
+### 🎯 TDD Context 우선순위 (Red-Green-Refactor)
+
+> Test First 접근법으로 견고한 코드 구조 설계
+
+1. **필수 (Must)**: 테스트 시나리오 정의, 테스트 구조 설계, 실패 테스트 작성
+2. **중요 (Should)**: 테스트 데이터 준비, Mock 전략, 통합 테스트 계획
+3. **선택 (Could)**: 성능 테스트, E2E 테스트, 접근성 테스트
+
+### 📋 TDD Context 수집 체크리스트
+
+**1. 테스트 시나리오 정의**
+
+- [ ] 핵심 비즈니스 로직 테스트 케이스 식별
+- [ ] Happy Path 시나리오 정의
+- [ ] Edge Case 및 Error Case 시나리오 정의
+- [ ] 사용자 인터랙션 시나리오 정의
+- [ ] 데이터 검증 시나리오 정의
+
+**2. 테스트 구조 설계**
+
+- [ ] Unit Test 범위 및 대상 컴포넌트/함수 식별
+- [ ] Integration Test 범위 및 API 연동 테스트 계획
+- [ ] Component Test 범위 및 UI 상호작용 테스트 계획
+- [ ] 테스트 파일 구조 및 네이밍 컨벤션 확인
+- [ ] 테스트 환경 설정 (Jest, React Testing Library, MSW 등)
+
+**3. 테스트 데이터 준비**
+
+- [ ] Mock 데이터 구조 설계
+- [ ] API Response Mock 데이터 준비
+- [ ] 테스트용 Fixture 데이터 생성
+- [ ] 다양한 상태값에 대한 테스트 데이터 준비
+- [ ] Error Response Mock 데이터 준비
+
+**4. Mock 전략 수립**
+
+- [ ] API 호출 Mock 전략 (MSW, jest.mock 등)
+- [ ] External Dependencies Mock 계획
+- [ ] Store/Context Mock 전략
+- [ ] 브라우저 API Mock 필요성 확인
+- [ ] 타이머/날짜 Mock 전략
+
+**5. 테스트 실행 계획**
+
+- [ ] Red Phase: 실패하는 테스트 작성 계획
+- [ ] Green Phase: 최소한의 구현으로 테스트 통과 계획
+- [ ] Refactor Phase: 코드 개선 및 테스트 유지 계획
+- [ ] 테스트 실행 순서 및 의존성 관리
+- [ ] CI/CD 파이프라인 테스트 통합 계획
+
+### ✅ 테스트 준비 완료 기준
+
+**진행 가능 (✅)**:
+
+- 필수 항목 (1,2,5) 100% 완료
+- 중요 항목 (3,4) 80% 이상 완료
+- 모든 테스트 케이스 시나리오 정의 완료
+- Mock 전략 및 테스트 데이터 준비 완료
+
+**더 조사 필요 (❌)**:
+
+- 필수 항목 미완료
+- 핵심 비즈니스 로직 테스트 케이스 불명확
+- Mock 전략 미수립
+- 테스트 환경 설정 미완료
+
+### 📝 TDD Context 정리 템플릿
+
+```markdown
+## TDD Context Summary
+
+**테스트 대상**: [Component/Function/Feature 명]
+**테스트 유형**: [Unit/Integration/Component/E2E]
+**핵심 시나리오**: [주요 비즈니스 로직 간단 설명]
+
+**테스트 시나리오**:
+
+**Happy Path**:
+- [ ] [정상적인 사용자 플로우 1]
+- [ ] [정상적인 사용자 플로우 2]
+- [ ] [정상적인 API 응답 처리]
+
+**Edge Cases**:
+- [ ] [경계값 테스트]
+- [ ] [빈 데이터 처리]
+- [ ] [최대/최소값 처리]
+
+**Error Cases**:
+- [ ] [API 에러 응답 처리]
+- [ ] [네트워크 에러 처리]
+- [ ] [Validation 에러 처리]
+
+**테스트 구조**:
+
+- 테스트 파일: [__tests__/ComponentName.test.tsx]
+- Mock 파일: [__mocks__/mockData.ts]
+- 테스트 유틸: [test-utils/...]
+
+**Mock 전략**:
+
+- API Mock: [MSW handlers 또는 jest.mock]
+- Store Mock: [Mock Provider 또는 initial state]
+- External Dependencies: [jest.mock 대상 라이브러리]
+
+**테스트 데이터**:
+
+- Mock Response: [API 응답 데이터 구조]
+- Fixture Data: [컴포넌트 props 테스트 데이터]
+- Error Data: [에러 상황 테스트 데이터]
+
+**Red-Green-Refactor 계획**:
+
+**Red Phase**:
+1. [실패하는 테스트 1] - [예상 실패 이유]
+2. [실패하는 테스트 2] - [예상 실패 이유]
+
+**Green Phase**:
+1. [최소 구현 1] - [테스트 통과를 위한 최소 코드]
+2. [최소 구현 2] - [테스트 통과를 위한 최소 코드]
+
+**Refactor Phase**:
+1. [코드 개선 포인트 1] - [리팩토링 방향]
+2. [코드 개선 포인트 2] - [리팩토링 방향]
+
+**준비 상태**: [✅ 테스트 작성 가능 / ❌ 더 조사 필요]
+**미해결 이슈**: [있다면 나열]
+```
+
+### 🚀 다음 단계 진행 조건
+
+**Testing 단계 완료 후**:
+
+- ✅ 테스트 코드 작성 완료 → **자동으로 Act 단계 진입** (004번 오케스트레이션이 [1002-context-act.mdc](mdc:.cursor/rules/1002-context-act.mdc) 호출)
+- ❌ 더 조사 필요 → 부족한 테스트 Context 추가 수집 후 재평가
+
+**테스트 완료 기준**:
+
+- Red-Green-Refactor 사이클의 Red 단계 완료 (실패하는 테스트 작성 완료)
+- 모든 핵심 테스트 케이스 작성 완료
+- Mock 데이터 및 테스트 환경 설정 완료
+
+### 🔄 단계 진행 규칙
+
+**Testing 단계에서 벗어나는 조건**:
+
+1. 테스트 코드 작성 완료 (Red 단계 완료)
+2. 모든 핵심 테스트 케이스 구현 완료
+3. **자동 전환** → Act 단계로 진입 (명시적 트리거 불필요)
+
+**Testing 단계 유지 조건**:
+
+- 테스트 코드 작성이 미완료된 상태
+- 핵심 테스트 케이스가 누락된 상태
+- Mock 데이터 또는 테스트 환경 설정이 미완료된 상태
+
+### 💡 TDD 핵심 원칙
+
+**목적**: 테스트로 설계 검증 → 안전한 구현 → 지속적 개선
+**산출물**: 실행 가능한 테스트 코드와 명확한 구현 가이드
+**체크포인트**: 모든 테스트 케이스가 비즈니스 요구사항을 반영하는지 확인
+
+### 🔗 오케스트레이션 연동
+
+**004번과의 연동**:
+
+- 이 규칙은 004번의 Phase 1.5 상태에서만 활성화
+- Planning 완료 + 명시적 테스트 트리거 발동 시 004번이 이 규칙 적용
+- 테스트 코드 작성 완료 시 004번이 자동으로 [1002-context-act.mdc](mdc:.cursor/rules/1002-context-act.mdc) 호출
+- Testing은 Planning 완료 후에만 시작 가능
+
+## 필수 사항
+
+**TDD Context가 완료되지 않으면 절대 구현 단계로 진행할 수 없습니다.** 명시적 테스트 트리거('test', '테스트 작성해줘' 등) 없이는 실제 테스트 작성으로 넘어가지 않습니다. Phase 1.5의 경우 명확한 테스트 계획이 나오지 않으면 User에게 되물어서 명확한 테스트 설계를 완성해야 합니다. 004-project-workflow.mdc가 전체 프로세스를 오케스트레이션합니다.

@@ -1,0 +1,17 @@
+# 굴착기 각 축별 각도 범위 제한
+
+Bkt_ang:
+  min: -125.0
+  max: 40.0
+  range: 165.0
+
+Arm_ang:
+  min: -150.0
+  max: -40.0
+  range: 110.0
+
+Boom_ang:
+  min: 0.0
+  max: 55.0
+  range: 55.0
+

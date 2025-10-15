@@ -1,0 +1,291 @@
+# ============================================================================
+# 굴착기 PID/FF 게인 파일 (ROS2 제어기용)
+# ============================================================================
+# 생성일: 2025-10-14
+# 모델링: 속도 기반 (Kv = v/duty)
+# 시정수: τ = 2s
+# 적용 범위: 저속 <10 deg/s
+# 검증: V3 대비 ±2% 이내 일치
+# ============================================================================
+
+# 제어 파라미터
+control_params:
+  tau: 2.0                    # 시정수 (s)
+  sample_time: 0.01           # 제어 주기 (s), 100Hz
+  settling_time: 8.0          # 정착시간 (4*tau)
+  max_duty: 100.0             # 최대 duty (%)
+  min_duty: 0.0               # 최소 duty (%)
+  anti_windup_limit: 10.0     # 적분기 포화 방지 한계
+  low_speed_threshold: 10.0   # 저속 임계값 (deg/s)
+
+# ============================================================================
+# PID 게인 (Full Gains)
+# ============================================================================
+# 단위:
+#   Kp: %/deg (Duty per degree error)
+#   Ki: %/(deg*s) (Duty per degree-second error)
+#   Kd: %/(deg/s) (Duty per degree/s error)
+# ============================================================================
+
+pid_gains:
+  arm:
+    in:
+      kp: 3.691
+      ki: 1.846
+      kd: 0.000
+      description: "Arm In (내전): 신뢰도 우수 (R²=0.921)"
+      lambda_factor: 0.10
+      kv: 2.709
+      
+    out:
+      kp: 3.597
+      ki: 1.799
+      kd: 0.000
+      description: "Arm Out (외전): Fallback (통합값)"
+      lambda_factor: 0.20
+      kv: 1.390
+
+  boom:
+    up:
+      kp: 11.431
+      ki: 5.716
+      kd: 0.000
+      description: "Boom Up (상승): 중력 보상 (λ=0.02, 특별 처리)"
+      lambda_factor: 0.02
+      kv: 4.374
+      warning: "10도 오차 시 114% duty 포화 가능, Anti-windup 필수"
+      
+    down:
+      kp: 6.382
+      ki: 3.191
+      kd: 0.000
+      description: "Boom Down (하강): 신뢰도 최고 (R²=0.992)"
+      lambda_factor: 0.05
+      kv: 3.134
+
+  bucket:
+    in:
+      kp: 1.654
+      ki: 0.827
+      kd: 0.000
+      description: "Bucket In (퍼내기): 저신뢰도 주의 (R²=0.432)"
+      lambda_factor: 0.10
+      kv: 6.045
+      warning: "저속 데이터 부족, 실측 후 재조정 필요"
+      
+    out:
+      kp: 1.569
+      ki: 0.784
+      kd: 0.000
+      description: "Bucket Out (버리기): 중간 신뢰도 (R²=0.64)"
+      lambda_factor: 0.75
+      kv: 0.850
+
+# ============================================================================
+# PID 안전 게인 (Safe Gains - 초기 테스트용)
+# ============================================================================
+# Ki를 50%로 감소하여 안전하게 시작
+# 테스트 후 점진적으로 증가: 60% → 80% → 100%
+# ============================================================================
+
+pid_gains_safe:
+  arm:
+    in:
+      kp: 3.691
+      ki: 0.923    # 50% of full
+      kd: 0.000
+      
+    out:
+      kp: 3.597
+      ki: 0.899    # 50% of full
+      kd: 0.000
+
+  boom:
+    up:
+      kp: 11.431
+      ki: 2.858    # 50% of full
+      kd: 0.000
+      
+    down:
+      kp: 6.382
+      ki: 1.595    # 50% of full
+      kd: 0.000
+
+  bucket:
+    in:
+      kp: 1.654
+      ki: 0.414    # 50% of full
+      kd: 0.000
+      
+    out:
+      kp: 1.569
+      ki: 0.392    # 50% of full
+      kd: 0.000
+
+# ============================================================================
+# FF (Feedforward) 게인 (저속 전용)
+# ============================================================================
+# 단위:
+#   kv: %/(deg/s) (Duty per velocity)
+#   k_offset: % (Base duty offset)
+# 
+# 사용법:
+#   u_ff = kv * target_velocity + k_offset
+# ============================================================================
+
+ff_gains:
+  arm:
+    in:
+      kv: 2.709
+      k_offset: 36.0
+      r_squared: 0.921
+      confidence: "high"
+      source: "ultra_low_speed"
+      
+    out:
+      kv: 1.390
+      k_offset: 40.2
+      r_squared: 0.0
+      confidence: "medium"
+      source: "integrated"
+
+  boom:
+    up:
+      kv: 4.374
+      k_offset: 35.9
+      r_squared: 0.902
+      confidence: "high"
+      source: "ultra_low_speed"
+      
+    down:
+      kv: 3.134
+      k_offset: 35.4
+      r_squared: 0.992
+      confidence: "excellent"
+      source: "ultra_low_speed"
+
+  bucket:
+    in:
+      kv: 6.045
+      k_offset: 0.0    # 원래 -22.6이지만 0 사용 권장!
+      r_squared: 0.432
+      confidence: "low"
+      source: "low_speed"
+      warning: "K_offset=-22.6은 비정상, 0으로 시작 후 실측 조정"
+      
+    out:
+      kv: 0.850
+      k_offset: 40.6
+      r_squared: 0.640
+      confidence: "medium"
+      source: "integrated"
+
+# ============================================================================
+# 제어 법칙 (Control Law)
+# ============================================================================
+# 
+# 1. 목표 속도 계산:
+#    target_velocity = (target_position - current_position) / dt
+# 
+# 2. FF 출력:
+#    if target_velocity > 0:  # In/Up 방향
+#        u_ff = kv_in * target_velocity + k_offset_in
+#    else:  # Out/Down 방향
+#        u_ff = kv_out * abs(target_velocity) + k_offset_out
+# 
+# 3. PID 출력:
+#    error = target_position - current_position
+#    integral += error * dt
+#    integral = clamp(integral, -anti_windup_limit, anti_windup_limit)
+#    derivative = (error - prev_error) / dt
+#    u_fb = kp * error + ki * integral + kd * derivative
+# 
+# 4. 총 제어 입력:
+#    u_total = u_ff + u_fb
+# 
+# 5. 밸브 선택 및 Duty 계산:
+#    if u_total > 0:
+#        valve = "in" or "up"
+#        duty = clamp(u_total, 0, 100)
+#    else:
+#        valve = "out" or "down"
+#        duty = clamp(abs(u_total), 0, 100)
+# ============================================================================
+
+# ============================================================================
+# 적용 절차 (Application Procedure)
+# ============================================================================
+# 
+# Step 1: 안전 게인으로 시작
+#   - pid_gains_safe 사용
+#   - 저속 테스트 (duty 40-50%)
+#   - 동작 확인
+# 
+# Step 2: 축별 순차 적용
+#   1. Bucket (Kp 가장 작음, 안전)
+#   2. Arm (중간 Kp)
+#   3. Boom (Kp 가장 큼, 주의)
+# 
+# Step 3: Ki 점진 증가
+#   - 60% → 80% → 100%
+#   - 각 단계마다 안정성 확인
+# 
+# Step 4: 미세 조정
+#   - 응답 느림 → Ki +20%
+#   - 오버슈트 → Ki -20%
+#   - 정상상태 오차 → Ki +30%
+# ============================================================================
+
+# ============================================================================
+# 성능 기대치 (Performance Expectations)
+# ============================================================================
+performance_targets:
+  settling_time: 8.0        # 정착시간 (s)
+  overshoot_max: 10.0       # 최대 오버슈트 (%)
+  steady_state_error: 0.3   # 정상상태 오차 (deg)
+  duty_accuracy: 10.0       # Duty 정확도 (%)
+
+# ============================================================================
+# 주의사항 (Warnings)
+# ============================================================================
+warnings:
+  boom_up:
+    - "10도 오차 시 duty 포화 가능 (114%)"
+    - "실제로는 2-3도 이내 제어되므로 문제없음"
+    - "Anti-windup 필수 적용"
+    
+  bucket_in:
+    - "Kv 신뢰도 낮음 (R²=0.432)"
+    - "K_offset=-22.6은 비정상, 0 사용 권장"
+    - "실측 데이터로 재조정 필수"
+    
+  bucket_out:
+    - "저속 데이터 부족"
+    - "통합값 사용, 저속 특성 미반영"
+    - "실측 후 미세 조정 필요"
+
+# ============================================================================
+# 검증 정보 (Validation Info)
+# ============================================================================
+validation:
+  method: "속도 기반 IMC 튜닝"
+  reference: "V3 통합 분석 결과"
+  accuracy:
+    kp_difference: "+2.0%"    # V3 대비 평균
+    ki_difference: "+1.3%"    # V3 대비 평균
+  theoretical_check:
+    ki_kp_ratio: 0.5          # Ki/Kp = 1/τ (이론값)
+    status: "verified"
+
+# ============================================================================
+# 메타데이터
+# ============================================================================
+metadata:
+  version: "1.0.0"
+  date: "2025-10-14"
+  author: "PID Gain Estimation System"
+  description: "속도 기반 모델링으로 재계산한 굴착기 PID/FF 게인"
+  model_type: "velocity_based"
+  speed_range: "low_speed (<10 deg/s)"
+  validation_status: "verified_against_v3"
+
